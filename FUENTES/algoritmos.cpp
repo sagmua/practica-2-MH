@@ -28,6 +28,9 @@ void Algoritmos::imprime(vector<double> v){
 
 
 
+
+
+
 //sobrecarga del operados multiplicacion para obtener la multiplicacion elemento a elemento
 // entre dos vectores:
 
@@ -44,27 +47,51 @@ void Algoritmos::realizaParticiones(){
 
 	srand(5);//fijamos una semilla.
 
+	//Obtenemos todos los indices de los datos:
 	vector<int> indices;
 	for(int i = 0; i < datos.size(); i++){
 		indices.push_back(i);
 	}
 
+	//Mezclamos los índices:
+	random_shuffle(indices.begin(), indices.end());
+
+	//tamaño de cada uno de los 5 conjuntos test conjunto test:
+	int tam_test = indices.size()/5;
+
 	//repetimos 5 veces para tener 5 particiones
-	for(int i = 0; i < 5; i++){
+	int resto = indices.size()%5;
+	auto it = indices.begin();
+	for(int i = 0; i < 5; i++, it+=tam_test){
 
-		//mezclamos los indices de forma aleatoria
-		random_shuffle(indices.begin(), indices.end());
-		auto medio = indices.end()-(indices.size()/2);
-
-		//separamos el conjunto en test y train:
-		vector<int> test (indices.begin(), medio);
-		vector<int> train (medio, indices.end());
-
+		
+		
 		pair<vector<int>, vector<int> >p;
+		//separamos el conjunto en test y train:
+		if(i == 4){
+			vector<int> test (it+resto, indices.end());
+			vector<int> train (indices.begin(), it+resto);
+			p.first = train;
+			p.second = test;
+		}
+		else if (i == 0){
+			vector<int> test (it, it+tam_test);
+			vector<int> train (it+tam_test, indices.end());
+			p.first = train;
+			p.second = test;
+		}
+		else{
+			vector<int> test (it, it+tam_test);
+			vector<int> train (it+tam_test, indices.end());
+			train.insert(train.end(), indices.begin(), it);
+			p.first = train;
+			p.second = test;
+		}
+
+		
 
 		//lo añadimos al vector de particiones
-		p.first = test;
-		p.second = train;
+		
 		particiones.push_back(p);
 	}
 

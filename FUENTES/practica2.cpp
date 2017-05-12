@@ -47,9 +47,21 @@ int main(int argc, char ** argv){
 	double media_tasas, media_tiempo;
 
 	cout << endl << "--------------DATOS ELEGIDOS: " << datos_deseados<< " -------"<<endl;
+
+	cout << "Tamanio datos: " << algoritmo.datos.size() << endl;
+
+	for(auto it = algoritmo.particiones.begin(); it != algoritmo.particiones.end(); it++){
+		cout << endl << "tamanio TRAIN: " << (*it).first.size();
+		cout << endl << "tamanio TEST: " << (*it).second.size();
+		cout << endl << "tamanio TOTAL: " << (*it).second.size() + (*it).first.size();
+		cout << endl << "------";
+
+	}
+
+
 	//************* ALGORITMO KNN *********
 	
-	
+	/*
 	cout << "\n************* ALGORITMO 1NN *********\n";
 	media_tiempo=0;
 	media_tasas = 0;
@@ -77,7 +89,7 @@ int main(int argc, char ** argv){
 
 
 	
-	//************* ALGORITMO RELIEF ******** */
+	//************* ALGORITMO RELIEF ********* /
 	cout << "\n************* ALGORITMO RELIEF *********\n";
 	media_tiempo = 0;
 	media_tasas = 0;
@@ -109,7 +121,7 @@ int main(int argc, char ** argv){
 	
 
 	
-	//**************ALGORITMO BL *************** /
+	// **************ALGORITMO BL ************** /
 		
 	cout << "\n************* ALGORITMO BL *********\n";
 	media_tiempo = 0;
@@ -382,7 +394,7 @@ int main(int argc, char ** argv){
 	cout << "TASA DE MEDIA AGE-CA: "<< media_tasas/10.0<< endl;
 	cout << endl << "****************" << endl;
 	
-
+	*/
 	
 
 	return 0;

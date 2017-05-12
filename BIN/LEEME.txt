@@ -1,0 +1,1 @@
+Para ejecutar simplemente hacer "make" y lanzar el ejecutable generado en ../BIN

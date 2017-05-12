@@ -1,0 +1,34 @@
+\select@language {spanish}
+\contentsline {section}{\numberline {1}Formulaci\IeC {\'o}n del problema. APC}{4}
+\contentsline {subsection}{\numberline {1.1}Introducci\IeC {\'o}n}{4}
+\contentsline {subsection}{\numberline {1.2}Objetivos}{4}
+\contentsline {section}{\numberline {2}Algoritmos empleados al problema.}{5}
+\contentsline {subsection}{\numberline {2.1}Algoritmos comunes}{5}
+\contentsline {subsection}{\numberline {2.2}Generados soluciones aleatorias}{5}
+\contentsline {subsection}{\numberline {2.3}Normalizaci\IeC {\'o}n de datos.}{5}
+\contentsline {subsection}{\numberline {2.4}Calcular distancia}{5}
+\contentsline {subsection}{\numberline {2.5}Funci\IeC {\'o}n de evaluaci\IeC {\'o}n}{6}
+\contentsline {subsection}{\numberline {2.6}Generaci\IeC {\'o}n de vecinos}{6}
+\contentsline {subsection}{\numberline {2.7}Operador cruce BLX}{7}
+\contentsline {subsection}{\numberline {2.8}Operador cruce aritm\IeC {\'e}tico}{7}
+\contentsline {subsection}{\numberline {2.9}Torneo Binario}{8}
+\contentsline {section}{\numberline {3}Estructuras de los principales m\IeC {\'e}todos de b\IeC {\'u}squeda}{8}
+\contentsline {subsection}{\numberline {3.1}B\IeC {\'u}squeda Local}{8}
+\contentsline {subsection}{\numberline {3.2}Algortimos gen\IeC {\'e}ticos}{10}
+\contentsline {subsubsection}{\numberline {3.2.1}AGG BLX}{10}
+\contentsline {subsubsection}{\numberline {3.2.2}AGG CA}{11}
+\contentsline {subsubsection}{\numberline {3.2.3}AGE BLX}{13}
+\contentsline {subsubsection}{\numberline {3.2.4}AGE CA}{15}
+\contentsline {subsection}{\numberline {3.3}Algoritmos mem\IeC {\'e}ticos}{16}
+\contentsline {subsubsection}{\numberline {3.3.1}AM-(10, 1.0)}{16}
+\contentsline {subsubsection}{\numberline {3.3.2}AM-(10, 0.1)}{18}
+\contentsline {subsubsection}{\numberline {3.3.3}AM-(10, 0.1mej)}{20}
+\contentsline {section}{\numberline {4}Algoritmo de comparaci\IeC {\'o}n}{21}
+\contentsline {section}{\numberline {5}Procedimiento para la realizaci\IeC {\'o}n de la pr\IeC {\'a}ctica}{22}
+\contentsline {subsection}{\numberline {5.1}Manual de usuario}{22}
+\contentsline {section}{\numberline {6}Experimentos y an\IeC {\'a}lisis de resultados}{23}
+\contentsline {subsection}{\numberline {6.1}An\IeC {\'a}lisis gen\IeC {\'e}ticos}{29}
+\contentsline {subsection}{\numberline {6.2}Generacionales VS Estacionarios}{29}
+\contentsline {subsection}{\numberline {6.3}BLX VS CA}{30}
+\contentsline {subsection}{\numberline {6.4}Exploraci\IeC {\'o}n VS explotaci\IeC {\'o}n}{30}
+\contentsline {section}{\numberline {7}Conclusi\IeC {\'o}n}{31}

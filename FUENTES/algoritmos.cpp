@@ -235,7 +235,7 @@ pair<double, double> Algoritmos::knn(const vector<int> & train, const vector<int
 	double alfa = 0.5;
 	double funcion_objetivo = tasa_clas*alfa + tasa_red*(1-alfa); 
 
-	error_tiempo.first = tasa_clas;
+	error_tiempo.first = funcion_objetivo;
 	error_tiempo.second = microseconds/1000000;	//pasamos a segundos
 
 

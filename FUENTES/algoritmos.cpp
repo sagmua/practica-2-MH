@@ -224,6 +224,17 @@ pair<double, double> Algoritmos::knn(const vector<int> & train, const vector<int
 	//Calculamos la tasa de clasificación:
 	double tasa_clas = 100.0*(numero_etiquetas_bien_clasificadas/train.size());
 
+	//Obtenemos el número de pesos que son menores que 0:
+	int menores_cero = 0;
+	for(auto it = pesos.begin(); it != pesos.end(); it++)
+		if(*it < 0.1)
+			menores_cero++;
+
+	double tasa_red = 100.0*(menores_cero)/(pesos.size());
+
+	double alfa = 0.5;
+	double funcion_objetivo = tasa_clas*alfa + tasa_red*(1-alfa); 
+
 	error_tiempo.first = tasa_clas;
 	error_tiempo.second = microseconds/1000000;	//pasamos a segundos
 

@@ -7,6 +7,7 @@
 
 default_random_engine generator (5);
 normal_distribution<double> distribution (0.0,0.3);
+double basura= 0;
 
 
 //Matodos para imprimir vectores por pantalla (simplemente para hacer debug)
@@ -193,7 +194,7 @@ double Algoritmos::calcularDistancia(const int a, const int b, const vector<doub
 
 
 //Función que calcula el 1-NN:
-pair<double, double> Algoritmos::knn(const vector<int> & train, const vector<int> & test, const vector<double> &pesos, bool bl){
+pair<double, double> Algoritmos::knn(const vector<int> & train, const vector<int> & test, const vector<double> &pesos, bool bl, double & tasa_red, double & funcion_objetivo){
 	//creamos un par donde almacenaremos el error y el tiempo:
 	pair<double,double> error_tiempo;
 	double numero_etiquetas_bien_clasificadas = 0;
@@ -257,10 +258,10 @@ pair<double, double> Algoritmos::knn(const vector<int> & train, const vector<int
 		if(*it < 0.1)
 			menores_cero++;
 
-	double tasa_red = 100.0*(menores_cero)/(pesos.size());
+	 tasa_red = 100.0*(menores_cero)/(pesos.size());
 
 	double alfa = 0.5;
-	double funcion_objetivo = tasa_clas*alfa + tasa_red*(1-alfa); 
+	funcion_objetivo = tasa_clas*alfa + tasa_red*(1-alfa); 
 
 	error_tiempo.first = funcion_objetivo;
 	error_tiempo.second = microseconds/1000000;	//pasamos a segundos
@@ -396,7 +397,7 @@ pair<vector<double> , double> Algoritmos::BL(const vector<int> & indices_datos, 
 
 	//vamos guardando la mejor solución obtenida hasta ahora (inicialmente la aleatoria):
 	vector<double> * mejores_pesos = &solucion_inicial;
-	double mejor_tasa_obtenida  = (knn(indices_datos,indices_datos, solucion_inicial, true)).first;
+	double mejor_tasa_obtenida  = (knn(indices_datos,indices_datos, solucion_inicial, true, basura, basura)).first;
 	num_evaluaciones++;
 
 	//cola de donde sacaremos aleatoriamente la componene que modificara la funcion generar vecino:
@@ -433,7 +434,7 @@ pair<vector<double> , double> Algoritmos::BL(const vector<int> & indices_datos, 
 			num_vecinos_generados++;
 
 			//Comprobamos si se obtiene una mejor tasa para el vecino generado:
-			double tasa_vecino = (knn(indices_datos,indices_datos, pesos_vecino, true)).first;
+			double tasa_vecino = (knn(indices_datos,indices_datos, pesos_vecino, true, basura, basura)).first;
 			num_evaluaciones++;
 
 
@@ -597,7 +598,7 @@ pair<vector<double>, double> Algoritmos::AGG_BLX(const vector<int> & indices_dat
 	vector<double> tasas;
 	tasas.reserve(30);
 	for(int i = 0; i < 30; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
 		num_evaluaciones++;
 	}
 
@@ -673,7 +674,7 @@ pair<vector<double>, double> Algoritmos::AGG_BLX(const vector<int> & indices_dat
 		double min_tasa = 101;
 		tasas_nueva_poblacion.reserve(30);
 		for(int i = 0; i < 30; i++){
-			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true).first);
+			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura).first);
 
 			//calculamos el peor de la generación:
 			if(tasas_nueva_poblacion[i] < min_tasa){
@@ -785,7 +786,7 @@ pair<vector<double>, double> Algoritmos::AGG_CA(const vector<int> & indices_dato
 	vector<double> tasas;
 	tasas.reserve(30);
 	for(int i = 0; i < 30; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
 		num_evaluaciones++;
 	}
 
@@ -864,7 +865,7 @@ pair<vector<double>, double> Algoritmos::AGG_CA(const vector<int> & indices_dato
 		double min_tasa = 101;
 		tasas_nueva_poblacion.reserve(30);
 		for(int i = 0; i < 30; i++){
-			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true).first);
+			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura).first);
 
 			//calculamos el peor de la generación:
 			if(tasas_nueva_poblacion[i] < min_tasa){
@@ -948,7 +949,7 @@ pair<vector<double>, double> Algoritmos::AGE_BLX(const vector<int> & indices_dat
 	vector<double> tasas;
 	tasas.reserve(30);
 	for(int i = 0; i < 30; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
 		num_evaluaciones++;
 	}
 
@@ -1009,7 +1010,7 @@ pair<vector<double>, double> Algoritmos::AGE_BLX(const vector<int> & indices_dat
 			int gen_a_mutar = rand()%poblacion_actual[0].size();
 
 			nueva_poblacion[individuo_a_mutar] = generarVecino(nueva_poblacion[individuo_a_mutar], gen_a_mutar);
-			tasas_nueva_poblacion[individuo_a_mutar]= knn(indices_datos, indices_datos, h1, true).first;
+			tasas_nueva_poblacion[individuo_a_mutar]= knn(indices_datos, indices_datos, h1, true, basura, basura).first;
 			num_evaluaciones++;
 
 		}
@@ -1035,8 +1036,8 @@ pair<vector<double>, double> Algoritmos::AGE_BLX(const vector<int> & indices_dat
 
 		//Una vez tenemos los dos peores padres de la generacion actual, comparamos con los dos descendientes del cruce;
 		// si son mejores los sustituimos:
-		double tasa_h1 = knn(indices_datos, indices_datos, h1, true).first;
-		double tasa_h2 = knn(indices_datos, indices_datos, h2, true).first;
+		double tasa_h1 = knn(indices_datos, indices_datos, h1, true, basura, basura).first;
+		double tasa_h2 = knn(indices_datos, indices_datos, h2, true, basura, basura).first;
 
 		num_evaluaciones+=2;
 
@@ -1138,7 +1139,7 @@ pair<vector<double>, double> Algoritmos::AGE_CA(const vector<int> & indices_dato
 	vector<double> tasas;
 	tasas.reserve(30);
 	for(int i = 0; i < 30; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
 		num_evaluaciones++;
 	}
 
@@ -1195,7 +1196,7 @@ pair<vector<double>, double> Algoritmos::AGE_CA(const vector<int> & indices_dato
 			int gen_a_mutar = rand()%poblacion_actual[0].size();
 
 			nueva_poblacion[individuo_a_mutar] = generarVecino(nueva_poblacion[individuo_a_mutar], gen_a_mutar);
-			tasas_nueva_poblacion[individuo_a_mutar]= knn(indices_datos, indices_datos, h1, true).first;
+			tasas_nueva_poblacion[individuo_a_mutar]= knn(indices_datos, indices_datos, h1, true, basura, basura).first;
 			num_evaluaciones++;
 
 		}
@@ -1223,8 +1224,8 @@ pair<vector<double>, double> Algoritmos::AGE_CA(const vector<int> & indices_dato
 
 		//Una vez tenemos los dos peores padres de la generacion actual, comparamos con los dos descendientes del cruce;
 		// si son mejores los sustituimos:
-		double tasa_h1 = knn(indices_datos, indices_datos, h1, true).first;
-		double tasa_h2 = knn(indices_datos, indices_datos, h2, true).first;
+		double tasa_h1 = knn(indices_datos, indices_datos, h1, true, basura, basura).first;
+		double tasa_h2 = knn(indices_datos, indices_datos, h2, true, basura, basura).first;
 
 		num_evaluaciones+=2;
 
@@ -1327,7 +1328,7 @@ pair<vector<double>, double> Algoritmos::AM_10_10(const vector<int> & indices_da
 	vector<double> tasas;
 	tasas.reserve(10);
 	for(int i = 0; i < 10; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
 		num_evaluaciones++;
 	}
 
@@ -1407,7 +1408,7 @@ pair<vector<double>, double> Algoritmos::AM_10_10(const vector<int> & indices_da
 		double min_tasa = 101;
 		tasas_nueva_poblacion.reserve(10);
 		for(int i = 0; i < 10; i++){
-			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true).first);
+			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura).first);
 
 			//calculamos el peor de la generación:
 			if(tasas_nueva_poblacion[i] < min_tasa){
@@ -1516,7 +1517,7 @@ pair<vector<double>, double> Algoritmos::AM_10_01(const vector<int> & indices_da
 	vector<double> tasas;
 	tasas.reserve(10);
 	for(int i = 0; i < 10; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
 		num_evaluaciones++;
 	}
 
@@ -1596,7 +1597,7 @@ pair<vector<double>, double> Algoritmos::AM_10_01(const vector<int> & indices_da
 		double min_tasa = 101;
 		tasas_nueva_poblacion.reserve(10);
 		for(int i = 0; i < 10; i++){
-			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true).first);
+			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura).first);
 
 			//calculamos el peor de la generación:
 			if(tasas_nueva_poblacion[i] < min_tasa){
@@ -1702,7 +1703,7 @@ pair<vector<double>, double> Algoritmos::AM_10_01_mej(const vector<int> & indice
 	vector<double> tasas;
 	tasas.reserve(10);
 	for(int i = 0; i < 10; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
 		num_evaluaciones++;
 	}
 
@@ -1782,7 +1783,7 @@ pair<vector<double>, double> Algoritmos::AM_10_01_mej(const vector<int> & indice
 		double min_tasa = 101;
 		tasas_nueva_poblacion.reserve(10);
 		for(int i = 0; i < 10; i++){
-			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true).first);
+			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura).first);
 
 			//calculamos el peor de la generación:
 			if(tasas_nueva_poblacion[i] < min_tasa){
@@ -1846,4 +1847,12 @@ pair<vector<double>, double> Algoritmos::AM_10_01_mej(const vector<int> & indice
 
 	return(pesos_tiempo);
 
+}
+
+
+
+
+pair<vector<double> , double> Algoritmos::SA(const vector<int> & indices_datos){
+	pair<vector<double>, double> pesos_tiempo;
+	return (pesos_tiempo);
 }

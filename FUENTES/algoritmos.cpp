@@ -7,6 +7,7 @@
 
 default_random_engine generator (5);
 normal_distribution<double> distribution (0.0,0.3);
+std::uniform_real_distribution<double> uniforme(0.0,1.0);
 double basura= 0;
 
 
@@ -1850,9 +1851,90 @@ pair<vector<double>, double> Algoritmos::AM_10_01_mej(const vector<int> & indice
 }
 
 
+double Algoritmos::generarTemperatura(double temp_actual, double temp_inicial, double temp_final, int max_enfriamientos){
+
+	double beta = (temp_inicial- temp_final)/(max_enfriamientos*temp_inicial*temp_final);
+	return(temp_actual/(1+beta*temp_actual));
+}
+
+
 
 
 pair<vector<double> , double> Algoritmos::SA(const vector<int> & indices_datos){
 	pair<vector<double>, double> pesos_tiempo;
+
+	//Calculamos una solución inicial de forma aleatoria:
+	vector<double> solucion_actual;
+	solucion_actual.reserve(datos[0].size());
+
+	for(int i = 0; i < datos[0].size(); i++){
+			double f = (double)rand() / RAND_MAX;
+			solucion_actual.push_back(f);
+	}
+
+	//Una vez tenemos la solución inicial, calculamos la temperatura inicial:
+	double coste_actual = knn(indices_datos, indices_datos, solucion_actual, true, basura, basura).first;
+
+	//Almacenamos la mejor solución:
+	vector<double> mejor_solucion = solucion_actual;
+	double coste_mejor_solucion = coste_actual;
+
+	//Calculamos la temperatura inicial:
+	double temp_inicial = 0.3*coste_actual/(-log(0.3));
+	double temp_actual = temp_inicial;
+
+	//Fijamos las condiciones del algortimo:
+	int max_vecinos = 10 * datos[0].size();
+	int max_exitos = 0.1 * max_vecinos;
+	int max_evaluaciones = 15000;
+	int max_enfriamientos = max_evaluaciones /max_vecinos*max_vecinos;
+	double temp_final = 0.001;
+	int enfriamientos_realizados = 1;
+	//Comenzamos la ejecución del algortimo:
+	int num_evaluaciones = 1;
+
+	auto start_time = chrono::high_resolution_clock::now();//medimos el tiempo de ejecución
+
+
+	while((temp_actual > temp_final)&& (enfriamientos_realizados< max_enfriamientos) && (num_evaluaciones < max_evaluaciones)){
+		int vecinos_generados = 0;
+		int exitos = 0;
+		while((vecinos_generados < max_vecinos)&& (exitos <max_exitos)){
+
+			vector<double> vecino = generarVecino(solucion_actual, rand()%datos[0].size());
+
+			double coste_vecino = knn(indices_datos, indices_datos, vecino, true, basura, basura).first;
+			num_evaluaciones++;
+			double dif_coste = coste_vecino - coste_actual;
+			//Generamos un valor de una distribución uniforme (0,1):
+			double unif = uniforme(generator);
+			
+			if((dif_coste < 0)|| (unif <= exp(-dif_coste/enfriamientos_realizados*temp_actual))   ){
+				solucion_actual = vecino;
+				coste_actual = coste_vecino;
+
+				//Comprobamos si es mejor que la mejor solucion, y en ese caso actualizamos esta:
+				if(coste_actual < coste_mejor_solucion){
+					mejor_solucion = solucion_actual;
+					coste_mejor_solucion = coste_actual;
+				}
+
+			}
+
+		}
+
+		
+		//Calculamos la temperatura de esta iteracion:
+		temp_actual = generarTemperatura(temp_actual, temp_inicial, temp_final, max_enfriamientos);
+		enfriamientos_realizados++;
+	}
+
+	auto end_time = chrono::high_resolution_clock::now(); //paramos de medir tiempo.
+	double microseconds = chrono::duration_cast<chrono::microseconds>(end_time - start_time).count();
+
+	pesos_tiempo.second = microseconds/1000000;	//pasamos a segundos
+	pesos_tiempo.first = mejor_solucion;
+
+
 	return (pesos_tiempo);
 }

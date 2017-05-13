@@ -45,7 +45,12 @@ class Algoritmos{
  	pair<vector<double> , double> BL(const vector<int> & indices_datos, double & tasa_mejor_solucion, vector<double> sol_inicial=vector<double>());
 
  	//Algoritmos PRACTICA 2:
+ 	//-----------:
  	pair<vector<double> , double> SA(const vector<int> & indices_datos);
+ 	//Calcular la temperatura en determinada iteración:
+ 	double generarTemperatura(double temp_actual, double temp_inicial, double temp_final, int max_enfriamientos);
+
+ 	//-------------
 
  	//genéticos:
 	void operadorCruceBLX(const vector<double> & padre1, const vector<double> & padre2, vector<double> & h1, vector<double> & h2 );

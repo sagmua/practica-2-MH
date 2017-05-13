@@ -9,6 +9,8 @@ using namespace std;
 int main(int argc, char ** argv){
 
 	//recibimos el fichero de datos que deseamos ejecutar de los tres que tenemos:
+	double basura;
+
 	if(argc != 2){
 		cerr << "ERROR ARGUMENTOS. USO: \"./practica1 <nombre_base_datos>\" "<<endl;
 		cerr << "Los nombres disponibles como argumento son: "<<endl;
@@ -57,6 +59,37 @@ int main(int argc, char ** argv){
 		cout << endl << "------";
 
 	}
+
+	//************* ALGORITMO AS *********
+	media_tiempo = 0;
+	media_tasas = 0;
+	for(int i = 0; i < algoritmo.particiones.size(); i++){
+		cout << endl<< "-----PARTICION " << i+1 << "----"<< endl;
+
+		cout << "TRAIN/TEST:"<<endl;
+		pesos_tiempo = algoritmo.SA(algoritmo.particiones[i].first);
+		cout << endl << "El tiempo empleado es: "<< pesos_tiempo.second << endl;
+		media_tiempo+=pesos_tiempo.second;
+		error_tiempo = algoritmo.knn(algoritmo.particiones[i].first,algoritmo.particiones[i].second, pesos_tiempo.first, false, basura, basura);
+		cout << "La tasa de clasificacion es: "<< error_tiempo.first;
+		media_tasas += error_tiempo.first;
+
+		cout <<endl<<  "TEST/TRAIN:"<<endl;
+		pesos_tiempo = algoritmo.SA(algoritmo.particiones[i].second);
+		cout << endl << "El tiempo empleado es: "<< pesos_tiempo.second << endl;
+		media_tiempo+=pesos_tiempo.second;
+		error_tiempo = algoritmo.knn(algoritmo.particiones[i].second,algoritmo.particiones[i].first, pesos_tiempo.first, false, basura, basura);
+		cout << "La tasa de clasificacion es: "<< error_tiempo.first;
+		media_tasas += error_tiempo.first;
+
+	}
+
+	cout << endl << "****************" << endl;
+	cout << "TIEMPO DE MEDIA AGG-BLX: "<< media_tiempo/10.0<< endl;
+	cout << "TASA DE MEDIA AGG-BLX: "<< media_tasas/10.0<< endl;
+	cout << endl << "****************" << endl;
+
+
 
 
 	//************* ALGORITMO KNN *********

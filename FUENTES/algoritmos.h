@@ -47,8 +47,10 @@ class Algoritmos{
  	//Algoritmos PRACTICA 2:
  	//-----------:
  	pair<vector<double> , double> SA(const vector<int> & indices_datos);
+ 	pair<vector<double> , double> ILS(const vector<int> & indices_datos);
  	//Calcular la temperatura en determinada iteración:
  	double generarTemperatura(double temp_actual, double temp_inicial, double temp_final, int max_enfriamientos);
+ 	vector<double> mutacionILS(const vector<double> & pesos,vector<int> & indices_mutar);
 
  	//-------------
 

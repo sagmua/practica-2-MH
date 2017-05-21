@@ -64,8 +64,8 @@ int main(int argc, char ** argv){
 	}
 	*/
 	
-	
-	//************* ALGORITMO AS *********
+	/*
+	//************* ALGORITMO SA *********
 	cout << "\n************* ALGORITMO SA *********\n";
 
 	media_tiempo = 0;
@@ -77,6 +77,41 @@ int main(int argc, char ** argv){
 
 		cout << "TRAIN/TEST:"<<endl;
 		pesos_tiempo = algoritmo.SA(algoritmo.particiones[i].first);
+		
+		error_tiempo = algoritmo.knn(algoritmo.particiones[i].first,algoritmo.particiones[i].second, pesos_tiempo.first, false, tasa_red, tasa_clas);
+		cout << endl << "El tiempo empleado es: "<< pesos_tiempo.second << endl;
+		cout << "La tasa de clasificacion es: "<< tasa_clas << endl;
+		cout << "La tasa de reduccion es: "<< tasa_red << endl;
+		cout << "La funcion objetivo es: "<< error_tiempo.first;
+		
+		media_tasa_clas += tasa_clas;
+		media_tasa_red+= tasa_red;
+		media_fun_objetivo+=error_tiempo.first;
+		media_tiempo+=error_tiempo.second;
+
+	}
+
+	cout << endl << "****************" << endl;
+	cout << "TIEMPO DE MEDIA SA: "<< media_tiempo/5.0<< endl;
+	cout << "TASA CLASIFICACION DE MEDIA SA: "<< media_tasa_clas/5.0<< endl;
+	cout << "TASA REDUCCION DE MEDIA SA: "<< media_tasa_red/5.0<< endl;
+	cout << "FUNCION OBJETIVO DE MEDIA SA: "<< media_fun_objetivo/5.0<< endl;
+	cout << endl << "****************" << endl;
+
+*/
+
+	//************* ALGORITMO ILS *********
+	cout << "\n************* ALGORITMO ILS *********\n";
+
+	media_tiempo = 0;
+	media_tasa_clas = 0;
+	media_tasa_red = 0;
+	media_fun_objetivo = 0;
+	for(int i = 0; i < algoritmo.particiones.size(); i++){
+		cout << endl<< "-----PARTICION " << i+1 << "----"<< endl;
+
+		cout << "TRAIN/TEST:"<<endl;
+		pesos_tiempo = algoritmo.ILS(algoritmo.particiones[i].first);
 		
 		error_tiempo = algoritmo.knn(algoritmo.particiones[i].first,algoritmo.particiones[i].second, pesos_tiempo.first, false, tasa_red, tasa_clas);
 		cout << endl << "El tiempo empleado es: "<< pesos_tiempo.second << endl;

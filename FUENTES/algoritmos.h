@@ -40,7 +40,7 @@ class Algoritmos{
  	void imprime(vector<int> v);
 
  	//ALGORITMOS:
- 	pair<double, double> knn(const vector<int> & train, const vector<int> & test, const vector<double> &pesos, bool bl, double & tasa_red, double & func_objetivo); //devuelve el porcentaje de acierto y el tiempo empleado.
+ 	pair<double, double> knn(const vector<int> & train, const vector<int> & test, const vector<double> &pesos, bool bl, double & tasa_red, double & tasa_clas); //devuelve el porcentaje de acierto y el tiempo empleado.
  	pair<vector<double> , double> relief(const vector<int> & train, const vector<int> & test);
  	pair<vector<double> , double> BL(const vector<int> & indices_datos, double & tasa_mejor_solucion, vector<double> sol_inicial=vector<double>());
 

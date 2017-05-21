@@ -9,7 +9,7 @@ using namespace std;
 int main(int argc, char ** argv){
 
 	//recibimos el fichero de datos que deseamos ejecutar de los tres que tenemos:
-	double basura;
+	double tasa_clas, tasa_red;
 
 	if(argc != 2){
 		cerr << "ERROR ARGUMENTOS. USO: \"./practica1 <nombre_base_datos>\" "<<endl;
@@ -46,47 +46,56 @@ int main(int argc, char ** argv){
 	Algoritmos algoritmo(datos_deseados);
 	pair<double, double> error_tiempo;
 	pair <vector<double> , double> pesos_tiempo;
-	double media_tasas, media_tiempo;
+	double media_tasa_clas, media_tasa_red, media_fun_objetivo, media_tiempo;
 
+
+	/*
 	cout << endl << "--------------DATOS ELEGIDOS: " << datos_deseados<< " -------"<<endl;
-
+	
 	cout << "Tamanio datos: " << algoritmo.datos.size() << endl;
 
 	for(auto it = algoritmo.particiones.begin(); it != algoritmo.particiones.end(); it++){
 		cout << endl << "tamanio TRAIN: " << (*it).first.size();
 		cout << endl << "tamanio TEST: " << (*it).second.size();
 		cout << endl << "tamanio TOTAL: " << (*it).second.size() + (*it).first.size();
+		//algoritmo.imprime(algoritmo.datos[((*it).second)[0]]);
 		cout << endl << "------";
 
 	}
-
+	*/
+	
+	
 	//************* ALGORITMO AS *********
+	cout << "\n************* ALGORITMO SA *********\n";
+
 	media_tiempo = 0;
-	media_tasas = 0;
+	media_tasa_clas = 0;
+	media_tasa_red = 0;
+	media_fun_objetivo = 0;
 	for(int i = 0; i < algoritmo.particiones.size(); i++){
 		cout << endl<< "-----PARTICION " << i+1 << "----"<< endl;
 
 		cout << "TRAIN/TEST:"<<endl;
 		pesos_tiempo = algoritmo.SA(algoritmo.particiones[i].first);
+		
+		error_tiempo = algoritmo.knn(algoritmo.particiones[i].first,algoritmo.particiones[i].second, pesos_tiempo.first, false, tasa_red, tasa_clas);
 		cout << endl << "El tiempo empleado es: "<< pesos_tiempo.second << endl;
-		media_tiempo+=pesos_tiempo.second;
-		error_tiempo = algoritmo.knn(algoritmo.particiones[i].first,algoritmo.particiones[i].second, pesos_tiempo.first, false, basura, basura);
-		cout << "La tasa de clasificacion es: "<< error_tiempo.first;
-		media_tasas += error_tiempo.first;
-
-		cout <<endl<<  "TEST/TRAIN:"<<endl;
-		pesos_tiempo = algoritmo.SA(algoritmo.particiones[i].second);
-		cout << endl << "El tiempo empleado es: "<< pesos_tiempo.second << endl;
-		media_tiempo+=pesos_tiempo.second;
-		error_tiempo = algoritmo.knn(algoritmo.particiones[i].second,algoritmo.particiones[i].first, pesos_tiempo.first, false, basura, basura);
-		cout << "La tasa de clasificacion es: "<< error_tiempo.first;
-		media_tasas += error_tiempo.first;
+		cout << "La tasa de clasificacion es: "<< tasa_clas << endl;
+		cout << "La tasa de reduccion es: "<< tasa_red << endl;
+		cout << "La funcion objetivo es: "<< error_tiempo.first;
+		
+		media_tasa_clas += tasa_clas;
+		media_tasa_red+= tasa_red;
+		media_fun_objetivo+=error_tiempo.first;
+		media_tiempo+=error_tiempo.second;
 
 	}
 
 	cout << endl << "****************" << endl;
-	cout << "TIEMPO DE MEDIA AGG-BLX: "<< media_tiempo/10.0<< endl;
-	cout << "TASA DE MEDIA AGG-BLX: "<< media_tasas/10.0<< endl;
+	cout << "TIEMPO DE MEDIA SA: "<< media_tiempo/5.0<< endl;
+	cout << "TASA CLASIFICACION DE MEDIA SA: "<< media_tasa_clas/5.0<< endl;
+	cout << "TASA REDUCCION DE MEDIA SA: "<< media_tasa_red/5.0<< endl;
+	cout << "FUNCION OBJETIVO DE MEDIA SA: "<< media_fun_objetivo/5.0<< endl;
 	cout << endl << "****************" << endl;
 
 
@@ -94,32 +103,37 @@ int main(int argc, char ** argv){
 
 	//************* ALGORITMO KNN *********
 	
-	/*
+	
 	cout << "\n************* ALGORITMO 1NN *********\n";
-	media_tiempo=0;
-	media_tasas = 0;
+	media_tiempo = 0;
+	media_tasa_clas = 0;
+	media_tasa_red = 0;
+	media_fun_objetivo = 0;
+
 	for(int i = 0; i < algoritmo.particiones.size(); i++){
 		cout << "-----PARTICION " << i+1<<  endl;
 		cout << "TRAIN/TEST:"<<endl;
 		error_tiempo = algoritmo.knn(algoritmo.particiones[i].first, algoritmo.particiones[i].second
-			,vector<double> (algoritmo.datos[i].size(), 1));
-		cout << endl << "La tasa de clasificacion es: "<< error_tiempo.first;
+			,vector<double> (algoritmo.datos[i].size(), 1), false, tasa_red, tasa_clas);
 		cout << endl << "El tiempo empleado es: "<< error_tiempo.second << endl;
-		media_tasas+=error_tiempo.first;
+		cout << "La tasa de clasificacion es: "<< tasa_clas << endl;
+		cout << "La tasa de reduccion es: "<< tasa_red << endl;
+		cout << "La funcion objetivo es: "<< error_tiempo.first;
+		media_tasa_clas += tasa_clas;
+		media_tasa_red+= tasa_red;
+		media_fun_objetivo+=error_tiempo.first;
 		media_tiempo+=error_tiempo.second;
 
-		cout << "TEST/TRAIN:"<<endl;
-		error_tiempo = algoritmo.knn(algoritmo.particiones[i].second,algoritmo.particiones[i].first,vector<double> (algoritmo.datos[i].size(), 1));
-		cout << endl << "La tasa de clasificacion es: "<< error_tiempo.first;
-		cout << endl << "El tiempo empleado es: "<< error_tiempo.second << endl;
-		media_tasas+=error_tiempo.first;
-		media_tiempo+=error_tiempo.second;
 	}
 
-	cout << endl<< "EL TIEMPO MEDIO DEL 1NN ES: " << media_tiempo/10.0 << endl;
-	cout << "TASA DE MEDIA 1NN: "<< media_tasas/10.0<< endl;
+	cout << endl << "****************" << endl;
+	cout << "TIEMPO DE MEDIA KNN: "<< media_tiempo/5.0<< endl;
+	cout << "TASA CLASIFICACION DE MEDIA KNN: "<< media_tasa_clas/5.0<< endl;
+	cout << "TASA REDUCCION DE MEDIA KNN: "<< media_tasa_red/5.0<< endl;
+	cout << "FUNCION OBJETIVO DE MEDIA KNN: "<< media_fun_objetivo/5.0<< endl;
+	cout << endl << "****************" << endl;
 
-
+/*
 
 	
 	//************* ALGORITMO RELIEF ********* /

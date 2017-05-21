@@ -195,7 +195,7 @@ double Algoritmos::calcularDistancia(const int a, const int b, const vector<doub
 
 
 //Función que calcula el 1-NN:
-pair<double, double> Algoritmos::knn(const vector<int> & train, const vector<int> & test, const vector<double> &pesos, bool bl, double & tasa_red, double & funcion_objetivo){
+pair<double, double> Algoritmos::knn(const vector<int> & train, const vector<int> & test, const vector<double> &pesos, bool bl, double & tasa_red, double & tasa_clas){
 	//creamos un par donde almacenaremos el error y el tiempo:
 	pair<double,double> error_tiempo;
 	double numero_etiquetas_bien_clasificadas = 0;
@@ -251,18 +251,26 @@ pair<double, double> Algoritmos::knn(const vector<int> & train, const vector<int
 	double microseconds = chrono::duration_cast<chrono::microseconds>(end_time - start_time).count();
 
 	//Calculamos la tasa de clasificación:
-	double tasa_clas = 100.0*(numero_etiquetas_bien_clasificadas/train.size());
+	
+	tasa_clas = 100.0*(numero_etiquetas_bien_clasificadas/test.size());
+	
 
 	//Obtenemos el número de pesos que son menores que 0:
 	int menores_cero = 0;
-	for(auto it = pesos.begin(); it != pesos.end(); it++)
-		if(*it < 0.1)
+	for(auto it = pesos.begin(); it != pesos.end(); it++){
+		if(*it < 0.1){
 			menores_cero++;
+		}
+	}
 
-	 tasa_red = 100.0*(menores_cero)/(pesos.size());
+	tasa_red = 100.0*(menores_cero)/(pesos.size());
+	//cout << tasa_red;
+	//cout << "tasa clasificación: "<< tasa_clas << endl;
+	//cout << "menores_cero= "<< menores_cero<< endl;
 
 	double alfa = 0.5;
-	funcion_objetivo = tasa_clas*alfa + tasa_red*(1-alfa); 
+	double funcion_objetivo = tasa_clas*alfa + tasa_red*(1-alfa); 
+	//cout << "funcion_objetivo: "<<funcion_objetivo << endl;
 
 	error_tiempo.first = funcion_objetivo;
 	error_tiempo.second = microseconds/1000000;	//pasamos a segundos
@@ -1887,21 +1895,29 @@ pair<vector<double> , double> Algoritmos::SA(const vector<int> & indices_datos){
 	int max_vecinos = 10 * datos[0].size();
 	int max_exitos = 0.1 * max_vecinos;
 	int max_evaluaciones = 15000;
-	int max_enfriamientos = max_evaluaciones /max_vecinos*max_vecinos;
+	int max_enfriamientos = max_evaluaciones /max_vecinos;
+	//max_enfriamientos = 1;
+	
 	double temp_final = 0.001;
-	int enfriamientos_realizados = 1;
+	int enfriamientos_realizados = 0;
 	//Comenzamos la ejecución del algortimo:
 	int num_evaluaciones = 1;
 
 	auto start_time = chrono::high_resolution_clock::now();//medimos el tiempo de ejecución
+	//cout << "Max vecinos: "<< max_vecinos << endl;
+	//cout << "MAX EXFRIAMIENTOS: " << max_enfriamientos<< endl;
 
+	int exitos = -1;
 
-	while((temp_actual > temp_final)&& (enfriamientos_realizados< max_enfriamientos) && (num_evaluaciones < max_evaluaciones)){
+	while( (enfriamientos_realizados< max_enfriamientos) && (num_evaluaciones < max_evaluaciones)
+		&&(exitos !=0)){
+		
 		int vecinos_generados = 0;
-		int exitos = 0;
-		while((vecinos_generados < max_vecinos)&& (exitos <max_exitos)){
+		exitos = 0;
+		while((vecinos_generados < max_vecinos)&& (exitos <max_exitos)&& (num_evaluaciones < max_evaluaciones)){
 
 			vector<double> vecino = generarVecino(solucion_actual, rand()%datos[0].size());
+			vecinos_generados++;
 
 			double coste_vecino = knn(indices_datos, indices_datos, vecino, true, basura, basura).first;
 			num_evaluaciones++;
@@ -1909,17 +1925,22 @@ pair<vector<double> , double> Algoritmos::SA(const vector<int> & indices_datos){
 			//Generamos un valor de una distribución uniforme (0,1):
 			double unif = uniforme(generator);
 			
-			if((dif_coste < 0)|| (unif <= exp(-dif_coste/enfriamientos_realizados*temp_actual))   ){
+			if((dif_coste > 0)|| (unif <= exp(-dif_coste/enfriamientos_realizados*temp_actual))   ){
 				solucion_actual = vecino;
 				coste_actual = coste_vecino;
+				exitos++;
+				
 
 				//Comprobamos si es mejor que la mejor solucion, y en ese caso actualizamos esta:
-				if(coste_actual < coste_mejor_solucion){
+				if(coste_actual > coste_mejor_solucion){
 					mejor_solucion = solucion_actual;
 					coste_mejor_solucion = coste_actual;
+					
+
 				}
 
 			}
+			
 
 		}
 

@@ -42,12 +42,14 @@ class Algoritmos{
  	//ALGORITMOS:
  	pair<double, double> knn(const vector<int> & train, const vector<int> & test, const vector<double> &pesos, bool bl, double & tasa_red, double & tasa_clas); //devuelve el porcentaje de acierto y el tiempo empleado.
  	pair<vector<double> , double> relief(const vector<int> & train, const vector<int> & test);
- 	pair<vector<double> , double> BL(const vector<int> & indices_datos, double & tasa_mejor_solucion, vector<double> sol_inicial=vector<double>());
+ 	pair<vector<double> , double> BL(const vector<int> & indices_datos, double & tasa_mejor_solucion,int max_evaluaciones=15000, vector<double> sol_inicial=vector<double>());
 
  	//Algoritmos PRACTICA 2:
  	//-----------:
  	pair<vector<double> , double> SA(const vector<int> & indices_datos);
  	pair<vector<double> , double> ILS(const vector<int> & indices_datos);
+ 	pair<vector<double> , double> DE_RAND(const vector<int> & indices_datos);
+ 	pair<vector<double> , double> DE_CURRENT_TO_BEST(const vector<int> & indices_datos);
  	//Calcular la temperatura en determinada iteración:
  	double generarTemperatura(double temp_actual, double temp_inicial, double temp_final, int max_enfriamientos);
  	vector<double> mutacionILS(const vector<double> & pesos,vector<int> & indices_mutar);
@@ -76,9 +78,9 @@ class Algoritmos{
  	vector<double> generarVecino(const vector<double> & pesos, int indice_mutar);
 
 
- 	
-
 
  };
+
+
 
  #endif

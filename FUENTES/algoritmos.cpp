@@ -9,6 +9,7 @@ default_random_engine generator (5);
 normal_distribution<double> distribution (0.0,0.3);
 std::uniform_real_distribution<double> uniforme(0.0,1.0);
 double basura= 0;
+double basura1 = 0;
 
 
 //Matodos para imprimir vectores por pantalla (simplemente para hacer debug)
@@ -182,7 +183,8 @@ double Algoritmos::calcularDistancia(const int a, const int b, const vector<doub
 	
 
 	for(int i = 0; i < tam; i+=2){
-		distancia+=(datos[a][i]-datos[b][i])*(datos[a][i]-datos[b][i])*pesos[i];
+		if(pesos[i] >= 0.1)
+			distancia+=(datos[a][i]-datos[b][i])*(datos[a][i]-datos[b][i])*pesos[i];
 	}
 
 	return (sqrt(distancia));
@@ -375,7 +377,7 @@ pair<vector<double> , double> Algoritmos::relief(const vector<int> & train, cons
 
 
 //Función que implementa la búsquedad local, iniciando los pesos mediante un criterio greedy (relief)
-pair<vector<double> , double> Algoritmos::BL(const vector<int> & indices_datos, double & tasa_mejor_solucion, vector<double> solucion_inicial){
+pair<vector<double> , double> Algoritmos::BL(const vector<int> & indices_datos, double & tasa_mejor_solucion, int max_evaluaciones, vector<double> solucion_inicial ){
 	deque<int> secuencia_atributos;
 	for(int i = 0; i < datos[0].size(); i++)
 		secuencia_atributos.push_back(i);
@@ -406,7 +408,7 @@ pair<vector<double> , double> Algoritmos::BL(const vector<int> & indices_datos, 
 
 	//vamos guardando la mejor solución obtenida hasta ahora (inicialmente la aleatoria):
 	vector<double> * mejores_pesos = &solucion_inicial;
-	double mejor_tasa_obtenida  = (knn(indices_datos,indices_datos, solucion_inicial, true, basura, basura)).first;
+	double mejor_tasa_obtenida  = (knn(indices_datos,indices_datos, solucion_inicial, true, basura, basura1)).first;
 	num_evaluaciones++;
 
 	//cola de donde sacaremos aleatoriamente la componene que modificara la funcion generar vecino:
@@ -424,7 +426,7 @@ pair<vector<double> , double> Algoritmos::BL(const vector<int> & indices_datos, 
 
 	auto start_time = chrono::high_resolution_clock::now();//medimos el tiempo de ejecución
 
-	while((num_evaluaciones < 15000) && (num_vecinos_generados < 20*N) ){
+	while((num_evaluaciones < max_evaluaciones) && (num_vecinos_generados < 20*N) ){
 
 		//Aqui vamos generando vecindario, de la mejor solucion obtenida:
 		if(genera_nuevo_vecindario){
@@ -443,7 +445,7 @@ pair<vector<double> , double> Algoritmos::BL(const vector<int> & indices_datos, 
 			num_vecinos_generados++;
 
 			//Comprobamos si se obtiene una mejor tasa para el vecino generado:
-			double tasa_vecino = (knn(indices_datos,indices_datos, pesos_vecino, true, basura, basura)).first;
+			double tasa_vecino = (knn(indices_datos,indices_datos, pesos_vecino, true, basura, basura1)).first;
 			num_evaluaciones++;
 
 
@@ -628,7 +630,7 @@ pair<vector<double>, double> Algoritmos::AGG_BLX(const vector<int> & indices_dat
 	vector<double> tasas;
 	tasas.reserve(30);
 	for(int i = 0; i < 30; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura1).first);
 		num_evaluaciones++;
 	}
 
@@ -704,7 +706,7 @@ pair<vector<double>, double> Algoritmos::AGG_BLX(const vector<int> & indices_dat
 		double min_tasa = 101;
 		tasas_nueva_poblacion.reserve(30);
 		for(int i = 0; i < 30; i++){
-			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura).first);
+			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura1).first);
 
 			//calculamos el peor de la generación:
 			if(tasas_nueva_poblacion[i] < min_tasa){
@@ -816,7 +818,7 @@ pair<vector<double>, double> Algoritmos::AGG_CA(const vector<int> & indices_dato
 	vector<double> tasas;
 	tasas.reserve(30);
 	for(int i = 0; i < 30; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura1).first);
 		num_evaluaciones++;
 	}
 
@@ -895,7 +897,7 @@ pair<vector<double>, double> Algoritmos::AGG_CA(const vector<int> & indices_dato
 		double min_tasa = 101;
 		tasas_nueva_poblacion.reserve(30);
 		for(int i = 0; i < 30; i++){
-			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura).first);
+			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura1).first);
 
 			//calculamos el peor de la generación:
 			if(tasas_nueva_poblacion[i] < min_tasa){
@@ -979,7 +981,7 @@ pair<vector<double>, double> Algoritmos::AGE_BLX(const vector<int> & indices_dat
 	vector<double> tasas;
 	tasas.reserve(30);
 	for(int i = 0; i < 30; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura1).first);
 		num_evaluaciones++;
 	}
 
@@ -1040,7 +1042,7 @@ pair<vector<double>, double> Algoritmos::AGE_BLX(const vector<int> & indices_dat
 			int gen_a_mutar = rand()%poblacion_actual[0].size();
 
 			nueva_poblacion[individuo_a_mutar] = generarVecino(nueva_poblacion[individuo_a_mutar], gen_a_mutar);
-			tasas_nueva_poblacion[individuo_a_mutar]= knn(indices_datos, indices_datos, h1, true, basura, basura).first;
+			tasas_nueva_poblacion[individuo_a_mutar]= knn(indices_datos, indices_datos, h1, true, basura, basura1).first;
 			num_evaluaciones++;
 
 		}
@@ -1066,8 +1068,8 @@ pair<vector<double>, double> Algoritmos::AGE_BLX(const vector<int> & indices_dat
 
 		//Una vez tenemos los dos peores padres de la generacion actual, comparamos con los dos descendientes del cruce;
 		// si son mejores los sustituimos:
-		double tasa_h1 = knn(indices_datos, indices_datos, h1, true, basura, basura).first;
-		double tasa_h2 = knn(indices_datos, indices_datos, h2, true, basura, basura).first;
+		double tasa_h1 = knn(indices_datos, indices_datos, h1, true, basura, basura1).first;
+		double tasa_h2 = knn(indices_datos, indices_datos, h2, true, basura, basura1).first;
 
 		num_evaluaciones+=2;
 
@@ -1169,7 +1171,7 @@ pair<vector<double>, double> Algoritmos::AGE_CA(const vector<int> & indices_dato
 	vector<double> tasas;
 	tasas.reserve(30);
 	for(int i = 0; i < 30; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura1).first);
 		num_evaluaciones++;
 	}
 
@@ -1226,7 +1228,7 @@ pair<vector<double>, double> Algoritmos::AGE_CA(const vector<int> & indices_dato
 			int gen_a_mutar = rand()%poblacion_actual[0].size();
 
 			nueva_poblacion[individuo_a_mutar] = generarVecino(nueva_poblacion[individuo_a_mutar], gen_a_mutar);
-			tasas_nueva_poblacion[individuo_a_mutar]= knn(indices_datos, indices_datos, h1, true, basura, basura).first;
+			tasas_nueva_poblacion[individuo_a_mutar]= knn(indices_datos, indices_datos, h1, true, basura, basura1).first;
 			num_evaluaciones++;
 
 		}
@@ -1254,8 +1256,8 @@ pair<vector<double>, double> Algoritmos::AGE_CA(const vector<int> & indices_dato
 
 		//Una vez tenemos los dos peores padres de la generacion actual, comparamos con los dos descendientes del cruce;
 		// si son mejores los sustituimos:
-		double tasa_h1 = knn(indices_datos, indices_datos, h1, true, basura, basura).first;
-		double tasa_h2 = knn(indices_datos, indices_datos, h2, true, basura, basura).first;
+		double tasa_h1 = knn(indices_datos, indices_datos, h1, true, basura, basura1).first;
+		double tasa_h2 = knn(indices_datos, indices_datos, h2, true, basura, basura1).first;
 
 		num_evaluaciones+=2;
 
@@ -1358,7 +1360,7 @@ pair<vector<double>, double> Algoritmos::AM_10_10(const vector<int> & indices_da
 	vector<double> tasas;
 	tasas.reserve(10);
 	for(int i = 0; i < 10; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura1).first);
 		num_evaluaciones++;
 	}
 
@@ -1438,7 +1440,7 @@ pair<vector<double>, double> Algoritmos::AM_10_10(const vector<int> & indices_da
 		double min_tasa = 101;
 		tasas_nueva_poblacion.reserve(10);
 		for(int i = 0; i < 10; i++){
-			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura).first);
+			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura1).first);
 
 			//calculamos el peor de la generación:
 			if(tasas_nueva_poblacion[i] < min_tasa){
@@ -1467,7 +1469,7 @@ pair<vector<double>, double> Algoritmos::AM_10_10(const vector<int> & indices_da
 
 			for(int i = 0; i < poblacion_actual.size(); i++){
 				double la_tasa;
-				poblacion_actual[i] = BL(indices_datos, la_tasa, poblacion_actual[i]).first;
+				poblacion_actual[i] = BL(indices_datos, la_tasa, 15000, poblacion_actual[i]).first;
 				tasas[i] = la_tasa;
 
 				num_evaluaciones+= 20*datos[0].size()+1;
@@ -1547,7 +1549,7 @@ pair<vector<double>, double> Algoritmos::AM_10_01(const vector<int> & indices_da
 	vector<double> tasas;
 	tasas.reserve(10);
 	for(int i = 0; i < 10; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura1).first);
 		num_evaluaciones++;
 	}
 
@@ -1627,7 +1629,7 @@ pair<vector<double>, double> Algoritmos::AM_10_01(const vector<int> & indices_da
 		double min_tasa = 101;
 		tasas_nueva_poblacion.reserve(10);
 		for(int i = 0; i < 10; i++){
-			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura).first);
+			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura1).first);
 
 			//calculamos el peor de la generación:
 			if(tasas_nueva_poblacion[i] < min_tasa){
@@ -1659,7 +1661,7 @@ pair<vector<double>, double> Algoritmos::AM_10_01(const vector<int> & indices_da
 
 			for(int i = 0; i < n_busquedas_locales; i++){
 				double la_tasa;
-				poblacion_actual[i] = BL(indices_datos, la_tasa, poblacion_actual[aleatorio[i]]).first;
+				poblacion_actual[i] = BL(indices_datos, la_tasa, 15000, poblacion_actual[aleatorio[i]]).first;
 				tasas[i] = la_tasa;
 
 				num_evaluaciones+= 20*datos[0].size()+1;
@@ -1733,7 +1735,7 @@ pair<vector<double>, double> Algoritmos::AM_10_01_mej(const vector<int> & indice
 	vector<double> tasas;
 	tasas.reserve(10);
 	for(int i = 0; i < 10; i++){
-		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura).first);
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura1).first);
 		num_evaluaciones++;
 	}
 
@@ -1813,7 +1815,7 @@ pair<vector<double>, double> Algoritmos::AM_10_01_mej(const vector<int> & indice
 		double min_tasa = 101;
 		tasas_nueva_poblacion.reserve(10);
 		for(int i = 0; i < 10; i++){
-			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura).first);
+			tasas_nueva_poblacion.push_back(knn(indices_datos, indices_datos, nueva_poblacion[i], true, basura, basura1).first);
 
 			//calculamos el peor de la generación:
 			if(tasas_nueva_poblacion[i] < min_tasa){
@@ -1844,7 +1846,7 @@ pair<vector<double>, double> Algoritmos::AM_10_01_mej(const vector<int> & indice
 
 			
 				double la_tasa;
-				poblacion_actual[mejor_padre_poblacion_actual] = BL(indices_datos, la_tasa, poblacion_actual[mejor_padre_poblacion_actual]).first;
+				poblacion_actual[mejor_padre_poblacion_actual] = BL(indices_datos, la_tasa, 15000, poblacion_actual[mejor_padre_poblacion_actual]).first;
 				tasas[mejor_padre_poblacion_actual] = la_tasa;
 
 				num_evaluaciones+= 20*datos[0].size()+1;
@@ -1902,7 +1904,7 @@ pair<vector<double> , double> Algoritmos::SA(const vector<int> & indices_datos){
 	}
 
 	//Una vez tenemos la solución inicial, calculamos la temperatura inicial:
-	double coste_actual = knn(indices_datos, indices_datos, solucion_actual, true, basura, basura).first;
+	double coste_actual = knn(indices_datos, indices_datos, solucion_actual, true, basura, basura1).first;
 
 	//Almacenamos la mejor solución:
 	vector<double> mejor_solucion = solucion_actual;
@@ -1940,7 +1942,7 @@ pair<vector<double> , double> Algoritmos::SA(const vector<int> & indices_datos){
 			vector<double> vecino = generarVecino(solucion_actual, rand()%datos[0].size());
 			vecinos_generados++;
 
-			double coste_vecino = knn(indices_datos, indices_datos, vecino, true, basura, basura).first;
+			double coste_vecino = knn(indices_datos, indices_datos, vecino, true, basura, basura1).first;
 			num_evaluaciones++;
 			double dif_coste = coste_vecino - coste_actual;
 			//Generamos un valor de una distribución uniforme (0,1):
@@ -2010,7 +2012,7 @@ pair<vector<double> , double> Algoritmos::ILS(const vector<int> & indices_datos)
 	
 	//Realizamos una búsqueda local sobre la solución:
 	double func_obj_solucion_actual;
-	solucion_a_mutar = BL(indices_datos, func_obj_solucion_actual, solucion_actual).first;
+	solucion_a_mutar = BL(indices_datos, func_obj_solucion_actual, 1000, solucion_actual).first;
 
 	//inicialmente, esa es la mejor solucion:
 	//para llevar a cabo la mejor solución:
@@ -2028,14 +2030,21 @@ pair<vector<double> , double> Algoritmos::ILS(const vector<int> & indices_datos)
 
 		vector<double> bl_mutada = mutacionILS(solucion_a_mutar, a_mutar);
 
+
+
 		//Aplicamos la BL sobre la solucion mutada:
-		solucion_actual = BL(indices_datos, func_obj_solucion_actual, solucion_actual).first;
+		double func_obj_busqueda=0;
+		vector<double> busqueda =BL(indices_datos, func_obj_busqueda, 1000,  bl_mutada).first;
+
+		if(func_obj_busqueda > func_obj_solucion_actual){
+			solucion_actual = busqueda;
+			func_obj_solucion_actual = func_obj_busqueda;
+			solucion_a_mutar = solucion_actual;
+		}
 
 		if(func_obj_solucion_actual > func_obj_mejor_solucion){
 			func_obj_mejor_solucion = func_obj_solucion_actual;
 			mejor_solucion = solucion_actual;
-
-			solucion_a_mutar = solucion_actual;
 		}
 
 	}
@@ -2051,3 +2060,267 @@ pair<vector<double> , double> Algoritmos::ILS(const vector<int> & indices_datos)
 
 	return pesos_tiempo;
 }
+
+
+
+pair<vector<double> , double> Algoritmos::DE_RAND(const vector<int> & indices_datos){
+	//En primer logar generamos una solución aleatoria:
+	pair<vector<double>, double> pesos_tiempo;
+
+
+	//matriz donde almacenamos la población. inicialmente aleatoria:
+	vector<double> individuo;
+	const int TAM_POBLACION = 50;
+	const double PROB_CRUCE = 0.5;
+	const double F = 0.5;
+
+
+	vector<vector<double> > poblacion_actual;
+	vector<vector<double> > nueva_poblacion;
+	for(int i = 0; i < TAM_POBLACION; i++){
+		individuo.clear();
+		individuo.reserve(datos[0].size());
+
+
+		for(int i = 0; i < datos[0].size(); i++){
+			double f = (double)rand() / RAND_MAX;
+			individuo.push_back(f);
+		}
+		poblacion_actual.push_back(individuo);
+	}
+
+	//Ahora realizamos la evaluzaión de los individuos de la población, 
+	// almacenandolos en el vector 'tasas'.
+	int num_evaluaciones = 0;
+
+	vector<double> mejor_solucion = poblacion_actual[0];
+	double tasa_mejor_solucion = 0;
+
+	vector<double> tasas;
+	tasas.reserve(TAM_POBLACION);
+	for(int i = 0; i < TAM_POBLACION; i++){
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura1).first);
+		num_evaluaciones++;
+
+		//Vamos guardando la mejor solución
+		if(tasas[i] > tasa_mejor_solucion){
+			tasa_mejor_solucion = tasas[i];
+			mejor_solucion = poblacion_actual[i];
+		}
+	}
+
+	
+	
+
+	auto start_time = chrono::high_resolution_clock::now();//medimos el tiempo de ejecución
+
+	
+
+	//Hasta llegar a las 15000 evaluaciones:
+	while (num_evaluaciones < 15000){
+
+
+		//Recorremos la poblacion actual:
+		for(int i = 0; i < poblacion_actual.size(); i++){
+
+			//Seleccionamos tres padres de forma aleatoria:
+			int padre1, padre2, padre3;
+			padre1 = rand()%poblacion_actual.size();
+			do{
+				padre2 = rand()%poblacion_actual.size();
+			}while(padre2 == padre1);
+			
+			do{
+				padre3 = rand()%poblacion_actual.size();
+			}while(padre3 == padre1 || padre3 == padre2);
+
+			//una vez que tenemos tres padres aleatorios:
+			vector<double> offSpring;
+
+			int indice_aleatorio = rand()%TAM_POBLACION;
+			for(int gen = 0; gen < poblacion_actual[padre1].size(); gen++){
+				double aleatorio = ((double)rand() / RAND_MAX);
+				if((aleatorio <= PROB_CRUCE) || (indice_aleatorio == i)){
+					offSpring.push_back(poblacion_actual[padre1][gen] + F * (poblacion_actual[padre2][gen] - poblacion_actual[padre3][gen]));
+				}
+				else{
+					offSpring.push_back(poblacion_actual[i][gen]);
+				}
+
+				//Normalizamos los valores:
+				if(offSpring[gen] > 1)
+					offSpring[gen] = 1;
+				else if(offSpring[gen] < 0)
+					offSpring[gen] = 0;
+			}
+
+			//Evaluamos el OffSpring obtenido:
+			double tasa_offSpring = knn(indices_datos, indices_datos, offSpring, true, basura, basura1).first;
+			num_evaluaciones++;
+
+			//Vamos reemplazando para generar iterativamente la nueva poblacion:
+			if(tasa_offSpring > tasas[i]){
+				tasas[i] = tasa_offSpring;
+				nueva_poblacion.push_back( offSpring);
+			}
+			else{
+				nueva_poblacion.push_back(poblacion_actual[i]);
+			}
+
+			if(tasas[i] > tasa_mejor_solucion){
+				tasa_mejor_solucion = tasas[i];
+				mejor_solucion = nueva_poblacion[i];
+			}
+
+
+		}
+
+		//Reemplazamos actualizamos las poblaciones:
+		poblacion_actual = nueva_poblacion;
+		nueva_poblacion.clear();
+
+
+	}
+
+	auto end_time = chrono::high_resolution_clock::now(); //paramos de medir tiempo.
+	double microseconds = chrono::duration_cast<chrono::microseconds>(end_time - start_time).count();
+
+	pesos_tiempo.second = microseconds/1000000;	//pasamos a segundos
+	pesos_tiempo.first = mejor_solucion;
+
+
+	return pesos_tiempo;
+}
+
+
+pair<vector<double> , double> Algoritmos::DE_CURRENT_TO_BEST(const vector<int> & indices_datos){
+	//En primer logar generamos una solución aleatoria:
+	pair<vector<double>, double> pesos_tiempo;
+
+
+	//matriz donde almacenamos la población. inicialmente aleatoria:
+	vector<double> individuo;
+	const int TAM_POBLACION = 50;
+	const double PROB_CRUCE = 0.5;
+	const double F = 0.5;
+
+
+	vector<vector<double> > poblacion_actual;
+	vector<vector<double> > nueva_poblacion;
+	for(int i = 0; i < TAM_POBLACION; i++){
+		individuo.clear();
+		individuo.reserve(datos[0].size());
+
+
+		for(int i = 0; i < datos[0].size(); i++){
+			double f = (double)rand() / RAND_MAX;
+			individuo.push_back(f);
+		}
+		poblacion_actual.push_back(individuo);
+	}
+
+	//Ahora realizamos la evaluzaión de los individuos de la población, 
+	// almacenandolos en el vector 'tasas'.
+	int num_evaluaciones = 0;
+
+	vector<double> mejor_solucion = poblacion_actual[0];
+	double tasa_mejor_solucion = 0;
+
+	vector<double> tasas;
+	tasas.reserve(TAM_POBLACION);
+	for(int i = 0; i < TAM_POBLACION; i++){
+		tasas.push_back(knn(indices_datos, indices_datos, poblacion_actual[i], true, basura, basura1).first);
+		num_evaluaciones++;
+
+		//Vamos guardando la mejor solución
+		if(tasas[i] > tasa_mejor_solucion){
+			tasa_mejor_solucion = tasas[i];
+			mejor_solucion = poblacion_actual[i];
+		}
+	}
+
+	
+	
+
+	auto start_time = chrono::high_resolution_clock::now();//medimos el tiempo de ejecución
+
+	
+
+	//Hasta llegar a las 15000 evaluaciones:
+	while (num_evaluaciones < 15000){
+
+
+		//Recorremos la poblacion actual:
+		for(int i = 0; i < poblacion_actual.size(); i++){
+
+			//Seleccionamos tres padres de forma aleatoria:
+			int padre1, padre2, padre3;
+			padre1 = rand()%poblacion_actual.size();
+			do{
+				padre2 = rand()%poblacion_actual.size();
+			}while(padre2 == padre1);
+			
+
+			//una vez que tenemos tres padres aleatorios:
+			vector<double> offSpring;
+
+			int indice_aleatorio = rand()%TAM_POBLACION;
+			for(int gen = 0; gen < poblacion_actual[padre1].size(); gen++){
+				double aleatorio = ((double)rand() / RAND_MAX);
+				if((aleatorio <= PROB_CRUCE) || (indice_aleatorio == i)){
+					offSpring.push_back(poblacion_actual[i][gen] + (F * (mejor_solucion[gen]-poblacion_actual[i][gen])) + (F * (poblacion_actual[padre1][gen] - poblacion_actual[padre2][gen])));
+				}
+				else{
+					offSpring.push_back(poblacion_actual[i][gen]);
+				}
+
+				//Normalizamos los valores:
+				if(offSpring[gen] > 1)
+					offSpring[gen] = 1;
+				else if(offSpring[gen] < 0)
+					offSpring[gen] = 0;
+			}
+
+			//Evaluamos el OffSpring obtenido:
+			double tasa_offSpring = knn(indices_datos, indices_datos, offSpring, true, basura, basura1).first;
+			num_evaluaciones++;
+
+			//Vamos reemplazando para generar iterativamente la nueva poblacion:
+			if(tasa_offSpring > tasas[i]){
+				tasas[i] = tasa_offSpring;
+				nueva_poblacion.push_back( offSpring);
+			}
+			else{
+				nueva_poblacion.push_back(poblacion_actual[i]);
+			}
+
+			if(tasas[i] > tasa_mejor_solucion){
+				tasa_mejor_solucion = tasas[i];
+				mejor_solucion = nueva_poblacion[i];
+			}
+
+
+		}
+
+		//Reemplazamos actualizamos las poblaciones:
+		poblacion_actual = nueva_poblacion;
+		nueva_poblacion.clear();
+
+
+	}
+
+	auto end_time = chrono::high_resolution_clock::now(); //paramos de medir tiempo.
+	double microseconds = chrono::duration_cast<chrono::microseconds>(end_time - start_time).count();
+
+	pesos_tiempo.second = microseconds/1000000;	//pasamos a segundos
+	pesos_tiempo.first = mejor_solucion;
+
+
+	return pesos_tiempo;
+}
+
+
+
+
+
+
